@@ -1,34 +1,67 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [name, setName] = useState('');
+  const [seconds, setSeconds] = useState(10);
+  const [isRunning, setIsRunning] = useState(false);
+  const [isFinished, setIsFinished] = useState(false);
+
+    useEffect(() => {
+        let interval: number | undefined;
+        if(isRunning && seconds > 0){
+            interval = setInterval(() => {
+                setSeconds(prev => prev - 1);
+            }, 1000);
+        }
+
+        if (seconds === 0 && isRunning) {
+            clearInterval(interval);
+            setIsRunning(false);
+            setIsFinished(true);
+        }
+
+        return () => clearInterval(interval);
+    }, [isRunning, seconds]);
+
+    const handleStart = () => {
+        setIsRunning(true);
+        setIsFinished(false);
+    };
+
+    const handleReset = () => {
+        setIsRunning(false);
+        setIsFinished(false);
+        setSeconds(10);
+        setName('');
+    };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="container">
+        <h1>Timer Motivator</h1>
+        {!isRunning && !isFinished && (
+            <>
+                <input type="text"
+                placeholder="input name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                />
+
+                <button onClick={handleStart} disabled={!name}>
+                    Timer start
+                </button>
+            </>
+        )}
+
+        {isRunning && <h2>{seconds} seconds left</h2>}
+
+        {isFinished && <h2>You got it, {name}! 💪</h2>}
+
+        {(isRunning || isFinished) && (
+            <button onClick={handleReset}>Reset</button>
+        )}
+
+    </div>
   )
 }
 

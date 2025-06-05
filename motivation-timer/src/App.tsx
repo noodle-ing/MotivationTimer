@@ -6,15 +6,24 @@ function App() {
   const [seconds, setSeconds] = useState(10);
   const [isRunning, setIsRunning] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
+  const motivationPhrases: string[] = ["you can do it!", "NEVER GIVE UP", "I believe in you", "dont stop bro"];
+  const [motivation, setMotivation] = useState("");
 
     useEffect(() => {
         let interval: number | undefined;
         if(isRunning && seconds > 0){
             interval = setInterval(() => {
                 setSeconds(prev => prev - 1);
+                const randomIndex = Math.floor(Math.random() * motivationPhrases.length);
+                setMotivation(motivationPhrases[randomIndex]);
             }, 1000);
         }
 
+        if (seconds === 0 && isRunning) {
+            clearInterval(interval);
+            setIsRunning(false);
+            setIsFinished(true);
+        }
         if (seconds === 0 && isRunning) {
             clearInterval(interval);
             setIsRunning(false);
@@ -36,6 +45,8 @@ function App() {
         setName('');
     };
 
+
+
   return (
     <div className="container">
         <h1>Timer Motivator</h1>
@@ -54,8 +65,15 @@ function App() {
         )}
 
         {isRunning && <h2>{seconds} seconds left</h2>}
+        {isFinished && (
+            <div>
+                <h2>You got it, {name} 💪</h2>
+            </div>
+        )}
 
-        {isFinished && <h2>You got it, {name}! 💪</h2>}
+        {isRunning && (
+            <p><i>{motivation}</i></p>
+        )}
 
         {(isRunning || isFinished) && (
             <button onClick={handleReset}>Reset</button>

@@ -30,7 +30,6 @@ function App() {
             interval = setInterval(() => {
                 setSeconds(prev => prev - 1);
 
-                // Pick random motivation every second
                 const randomIndex = Math.floor(Math.random() * motivationPhrases.length);
                 setMotivation(motivationPhrases[randomIndex]);
             }, 1000);
@@ -57,7 +56,7 @@ function App() {
                     />
 
                     <button onClick={startTimer} disabled={isRunning || name.trim() === ''}>
-                        {isFinished ? "Попробовать ещё раз" : "Старт таймера"}
+                        {isFinished ? "Try again" : "Start timer"}
                     </button>
                 </>
             )}
@@ -70,7 +69,7 @@ function App() {
 
             {isFinished && (
                 <div>
-                    <h2>Ты справился, {name} 💪</h2>
+                    <h2>You did that, {name} 💪</h2>
                     <button onClick={handleReset}>Try again</button>
                 </div>
             )}

@@ -1,41 +1,18 @@
-import { useState, useEffect } from 'react'
-import './App.css'
+import { useState, useEffect } from 'react';
+import './App.css';
 
 function App() {
-  const [name, setName] = useState('');
-  const [seconds, setSeconds] = useState(10);
-  const [isRunning, setIsRunning] = useState(false);
-  const [isFinished, setIsFinished] = useState(false);
-  const motivationPhrases: string[] = ["you can do it!", "NEVER GIVE UP", "I believe in you", "dont stop bro"];
-  const [motivation, setMotivation] = useState("");
+    const [name, setName] = useState('');
+    const [seconds, setSeconds] = useState(10);
+    const [isRunning, setIsRunning] = useState(false);
+    const [isFinished, setIsFinished] = useState(false);
+    const motivationPhrases: string[] = ["you can do it!", "NEVER GIVE UP", "I believe in you", "dont stop bro"];
+    const [motivation, setMotivation] = useState("");
 
-    useEffect(() => {
-        let interval: number | undefined;
-        if(isRunning && seconds > 0){
-            interval = setInterval(() => {
-                setSeconds(prev => prev - 1);
-                const randomIndex = Math.floor(Math.random() * motivationPhrases.length);
-                setMotivation(motivationPhrases[randomIndex]);
-            }, 1000);
-        }
-
-        if (seconds === 0 && isRunning) {
-            clearInterval(interval);
-            setIsRunning(false);
-            setIsFinished(true);
-        }
-        if (seconds === 0 && isRunning) {
-            clearInterval(interval);
-            setIsRunning(false);
-            setIsFinished(true);
-        }
-
-        return () => clearInterval(interval);
-    }, [isRunning, seconds]);
-
-    const handleStart = () => {
+    const startTimer = () => {
         setIsRunning(true);
         setIsFinished(false);
+        setSeconds(10);
     };
 
     const handleReset = () => {
@@ -43,44 +20,62 @@ function App() {
         setIsFinished(false);
         setSeconds(10);
         setName('');
+        setMotivation("");
     };
 
+    useEffect(() => {
+        let interval: ReturnType<typeof setInterval>;
 
+        if (isRunning && seconds > 0) {
+            interval = setInterval(() => {
+                setSeconds(prev => prev - 1);
 
-  return (
-    <div className="container">
-        <h1>Timer Motivator</h1>
-        {!isRunning && !isFinished && (
-            <>
-                <input type="text"
-                placeholder="input name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                />
+                // Pick random motivation every second
+                const randomIndex = Math.floor(Math.random() * motivationPhrases.length);
+                setMotivation(motivationPhrases[randomIndex]);
+            }, 1000);
+        } else if (seconds === 0 && isRunning) {
+            setIsRunning(false);
+            setIsFinished(true);
+            setMotivation("");
+        }
 
-                <button onClick={handleStart} disabled={!name}>
-                    Timer start
-                </button>
-            </>
-        )}
+        return () => clearInterval(interval);
+    }, [isRunning, seconds]);
 
-        {isRunning && <h2>{seconds} seconds left</h2>}
-        {isFinished && (
-            <div>
-                <h2>You got it, {name} 💪</h2>
-            </div>
-        )}
+    return (
+        <div className="container">
+            <h1>Timer Motivator</h1>
 
-        {isRunning && (
-            <p><i>{motivation}</i></p>
-        )}
+            {!isRunning && !isFinished && (
+                <>
+                    <input
+                        type="text"
+                        placeholder="input name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                    />
 
-        {(isRunning || isFinished) && (
-            <button onClick={handleReset}>Reset</button>
-        )}
+                    <button onClick={startTimer} disabled={isRunning || name.trim() === ''}>
+                        {isFinished ? "Попробовать ещё раз" : "Старт таймера"}
+                    </button>
+                </>
+            )}
 
-    </div>
-  )
+            {isRunning && <h2>{name}: {seconds} seconds left</h2>}
+
+            {isRunning && (
+                <p><i>{motivation}</i></p>
+            )}
+
+            {isFinished && (
+                <div>
+                    <h2>Ты справился, {name} 💪</h2>
+                    <button onClick={handleReset}>Try again</button>
+                </div>
+            )}
+        </div>
+    );
 }
 
-export default App
+export default App;
